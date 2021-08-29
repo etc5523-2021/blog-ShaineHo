@@ -1,0 +1,15 @@
+output_dir: "docs"
+navbar:
+   title: "Shaine's  Blogs"
+   left:
+     - text: "Home"
+       href: 
+     - text: "Blog 1"
+       href: blog1.html
+     - text: "Post 2"
+       href: 
+output:
+  html_document:
+    theme: cerulean
+    include:
+    css: styles.css

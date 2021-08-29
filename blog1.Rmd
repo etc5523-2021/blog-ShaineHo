@@ -1,0 +1,12 @@
+---
+title: "Covid-19 situaltion in Austria"
+author: "Yin Shan Ho"
+output:
+  html_document:
+    theme: cerulean
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+

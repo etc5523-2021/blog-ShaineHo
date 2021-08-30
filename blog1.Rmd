@@ -1,12 +1,225 @@
 ---
-title: "Covid-19 situaltion in Austria"
+title: "Covid-19 in Austria"
 author: "Yin Shan Ho"
+date: "8/29/2021"
 output:
   html_document:
-    theme: cerulean
+    theme: journal
+    toc: true
+    toc_float: true
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(tidyverse)
+library(rnaturalearth)
+library(sf)
+library(plotly)
+library(kableExtra)
 ```
+
+```{css}
+.navbar{
+  background-image: "#E74C3C";
+}
+```
+
+
+```{r laod data}
+load(here::here("data/coronavirus.rda")) 
+vaccinations <- readr::read_csv(here::here("data/vaccinations.csv"))
+```
+
+# Introduction
+
+Have you ever heard of the lyrics: "Imagine there's no countries. It isn't hard to do." from Imagine by John Lennon. It was not that difficult to imagine under the globalization before everything started in 2019. However, the world has changed since then. I believe that COVID-19 is already a familiar term to you all as it has affect all humankind since its outbreak, right? Due to the Pandemic, the borders had shut down on after another, the cities were locked down.  The living styles had also changed a lot, such as people work online, students study online which leads to a boom in online industry. Since it has been affecting us for a long period of time and it is still existing, it is necessary for us get to know more about it and fight against the disaster together to restore the order of the world. 
+
+## What is COVID-19?
+Covid-19 is an an infectious disease caused by severe acute respiratory coronavirus which had brought a pandemic to the mankind since late 2019. As of August, 2021, more than 200 million confirmed cases have been reported in countries and regions around the world meanwhile the numbers are still rising. 
+
+On average it takes 5–6 days from when someone is infected with the virus for symptoms to show, however it can take up to 14 days. The symptoms include: 
+
+**Most common symptoms:**
+
+- fever
+- dry cough
+- tiredness
+
+**Less common symptoms:**
+
+- aches and pains
+- sore throat
+- diarrhea
+- conjunctivitis
+- headache
+- loss of taste or smell
+- a rash on skin, or discoloration of fingers or toes
+
+**Serious symptoms:**
+
+- difficulty breathing or shortness of breath
+- chest pain or pressure
+- loss of speech or movement
+
+# Situation in Europe
+
+## Total Number of confirmed cases
+
+```{r filter data, include = FALSE}
+# import data of Europe
+europe <- ne_countries(continent = "europe", returnclass = "sf", scale = "medium")%>% 
+  select(name, pop_est)
+
+# check unmatched data
+europe %>% 
+  anti_join(coronavirus, by = c("name" = "country"))
+
+# recode to appropriate names
+europe <- europe %>% 
+  mutate(name = recode(name,
+                     "Bosnia and Herz." = "Bosnia and Herzegovina",
+                       "Czech Rep." = "Czechia"))
+
+total_cases <- coronavirus %>%
+  group_by(country, type, lat, long) %>% 
+  summarise(cases = sum(cases)/1000)
+
+# join two data sets together 
+europe_covid_total <- total_cases %>% 
+  right_join(europe, by = c("country" = "name")) %>% 
+  mutate(cases = round(cases,0)) %>% 
+  filter(type == "confirmed")
+
+```
+
+```{r europe-map}
+europe_map <- europe_covid_total %>% 
+  ggplot()+
+  geom_sf(mapping = aes(geometry = geometry, fill = cases), size = 0.3)+
+  geom_text(data = europe_covid_total,aes(x= long, y = lat, label = country),color = "transparent" )+
+  scale_fill_distiller(palette = "Reds", na.value = "white", direction = 1)+
+  xlim(-20, 170)+ 
+  ylim(20, 90)+
+  labs(title = "Total number of cases confirmed in Europe(in 1000), updated: 8/25/2021",
+       fill = "") +
+  theme_bw()+
+  theme(panel.grid.major = element_line(colour = "transparent"))
+
+ggplotly(europe_map, height = 500, width = 800) %>% 
+   layout(xaxis = list(showticklabels = FALSE, title = ""),
+
+                    yaxis = list(showticklabels = FALSE, title = ""))
+```
+
+Based on the map, it is found that, Russia, France, United Kingdom, etc have more confirmed cases compare to the others. Whereas, the Southern European and Northern European got less number of confirmed. The possible reason is that the population in this countries are lower. The map above is an <mark>**interactive map**</mark> which includes the total number of confirmed up to 8/25/2021. You can move your mouse on the map to check on the cases confirmed in each countries.
+
+## Percentage of cases confirmed
+
+```{r eruope-pct-cases}
+pct_confirmed_cases <- total_cases %>% 
+  inner_join(europe, by = c("country" = "name")) %>% 
+  group_by(type, country) %>% 
+  summarise(cases_pct = 1000*1000000*cases/pop_est) %>% 
+  mutate(cases_pct = round(cases_pct,0))%>% 
+  filter(type == "confirmed") %>% 
+  ungroup() %>% 
+  group_by(country) %>% 
+  summarise(cases_pct = sum(cases_pct)) %>% 
+  arrange(desc(cases_pct))
+
+Ranking = 1:length(pct_confirmed_cases$cases_pct)
+
+pct_confirmed_cases <- cbind(Ranking, pct_confirmed_cases)
+
+pct_confirmed_cases %>% 
+  kable(caption = "Total number of confirmed per 100000 population", 
+      align = "c", 
+      col.names = c("Ranking","Country", "Number of confirmed")) %>%  
+  row_spec(0, color = "white", background = "#E74C3C") %>% 
+  row_spec(21, background = "#5DADE2", color = "white") %>% 
+  kable_styling(bootstrap_options = "striped", font_size = 12) %>% 
+  scroll_box(width = "100%", height = "300px")
+
+```
+
+After adjusting the  confirmed cases by population, it's a different story. From the table above, it is found that some of the Northern European like Sweden, Luxembourg are ranking high with the percentage of confirmed cases. Whereas, those who were having high total number of confirmed like Russia, France and Italy are ranking comparatively lower than before. 
+
+<br>
+
+# Situation in Austria
+
+## Introduction of Austria
+
+```{r austria-flag, out.extra='style="float:right; padding:5px"'}
+knitr::include_graphics("http://98.129.95.58/public/anthems/images/Austria_flag.jpg")
+```
+Austria is located in Central Europe. It is bordered by the Czech Republic and Germany to the north, Slovakia and Hungary to the east, Slovenia and Italy to the south, and Switzerland and Liechtenstein to the west. 
+
+Vienna is the capital city of Austria which is always associated with music. It is a dreamland for those who are in love of classical music. Since I have learned playing piano when I was young, I have been practicing a lot of songs from the Austrian musician like Ludwig van Beethoven, Franz Joseph Haydn, Wolfgang Amadeus Mozart, etc. Austria is always where I wanted to go. And this is the reason why I am interested to study the COVID-19 situation in this country. So as to know when will we be able to enter Austria.
+
+## Overall trend of cases in Austria
+
+```{r aus-daily-caes}
+austriacovid <- coronavirus %>% 
+  filter(country == "Austria") %>% 
+  left_join(vaccinations, by = c("country" = "location", "date" = "date")) %>% 
+  mutate(date = as.Date(date))
+
+auscovid_cases <- austriacovid %>% 
+  filter(cases >=0) %>% 
+  ggplot(aes(x = date, y = cases)) + 
+  geom_bar(stat = "identity", fill = "red3") +
+  facet_wrap(~type, ncol = 1, scales = "free_y")+
+  ylab("Number of cases")+
+  xlab("Date")+
+  scale_x_date(date_breaks = "60 days",date_labels = "%d-%m-%Y")+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle=20, hjust = 1)) 
+  ggplotly(auscovid_cases)
+```
+
+Based on the trend of the cases, we can see that the trend of the confirmed, death and recovery cases following the same trend. The number of cases were very low from the beginning of the cases entering the country and remained low until late September 2020. There was spark of the cases since then and the number started to drop from the early December. The possible reason was due to the season to winter when the virus is more likely to remain active.
+
+Later on, there was decrease in the number cases when the citizens started to inject the vaccines. This indicate the effectiveness of the vaccines. However, the number increases again from late February when there was the mutant virus such as type Alpha, Beta, Gamma, Delta which are the most dangerous spread around the world. The mutant virus had faster speed of spreading and lowered the effectiveness of the vaccines caused another boom of cases to the whole world. 
+
+## Number of daily vaccinations
+
+```{r aus-daily-vaccine, fig.height=3}
+ausvaccinations <- vaccinations %>% 
+  filter(location == "Austria") %>% 
+  ggplot(aes(x = date,
+             y = daily_vaccinations))+ 
+  geom_col(fill = "red3")+
+  ylab("Number of daily vaccinations")+
+  xlab("Date")+
+  scale_x_date(date_breaks = "30 days",date_labels = "%d-%m-%Y")+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle=20, hjust = 1))
+  ggplotly(ausvaccinations, height = 400, width = 700)
+```
+
+From the barchart above, it is found that people in Austria are quite active in injecting the vaccines. The decreasing trend from July was probably due to most of the citizens had fully injected the vaccines which had lowered the number of daily injection.
+
+## Summary of cases and vaccinations status
+
+```{r}
+austriacovid %>% 
+  select(date, type, cases, daily_vaccinations) %>% 
+  filter(cases > 0) %>% 
+  pivot_wider(names_from = type,
+              values_from = cases) %>% 
+  kable(caption = "Detailed data of cases and vaccinations in Austria",
+      align = "c", 
+      col.names = c("Date", 
+                    "Daily vaccinations", 
+                    "Daily confirmed", 
+                    "Daily Death", 
+                    "Daily Recoverd")) %>%  
+  row_spec(0, color = "white", background = "#E74C3C") %>% 
+  kable_styling(bootstrap_options = "striped", font_size = 12) %>% 
+  scroll_box(width = "100%", height = "300px")
+```
+
+The table above is a summary of daily cases and vaccination status in Austria. The NAs in the Daily vaccinations column is due to the reason that the vaccines were not yet invented at the beginning of the Pandemic. The NA in that column remains until 2020-12-28 when the country started the vaccinations. Whereas the NAs in the daily cases columns indicate that there were no cases detected in that day. That is, no confirmed cases, no death cases or no recovered cases, respectively. 
+
 

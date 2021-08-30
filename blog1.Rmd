@@ -1,6 +1,5 @@
 ---
 title: "Covid-19 in Austria"
-author: "Yin Shan Ho"
 date: "8/29/2021"
 output:
   html_document:
@@ -16,12 +15,6 @@ library(rnaturalearth)
 library(sf)
 library(plotly)
 library(kableExtra)
-```
-
-```{css}
-.navbar{
-  background-image: "#E74C3C";
-}
 ```
 
 

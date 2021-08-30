@@ -1,0 +1,14 @@
+---
+title: "welcome"
+output: 
+  html_document:
+    theme: cerulean
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Hello
+
+hello there, this is Shaine's blog~

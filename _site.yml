@@ -2,9 +2,11 @@ output_dir: "docs"
 navbar:
    title: "Shaine's  Blogs"
    left:
+     - text: "Home"
+       href: index.html
      - text: "Blog 1"
        href: blog1.html
-     - text: "Post 2"
+     - text: ""
        href: 
 output:
   html_document:

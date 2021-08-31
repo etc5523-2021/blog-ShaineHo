@@ -1,5 +1,4 @@
 ---
-title: "welcome"
 output: 
   html_document:
     theme: cerulean
@@ -9,6 +8,17 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Hello
+```{css, echo = FALSE}
+.navbar{
+  background: #66CDAA;
+}
+h1{
+  color: #008B8B;
+}
+```
 
-hello there, this is Shaine's blog~
+# Welcome
+
+Hello there! This is Shaine's blog~
+
+<img src="https://i2.wp.com/nileease.com/wp-content/uploads/2020/09/fbe42f6da526b9da82ddba860e5700bf.gif" alt="Bello">

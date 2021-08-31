@@ -1,25 +1,25 @@
 # My Blog
 
 
-This is the blog of [FILL].
-The URL of this blog is [FILL].
+This is the blog of Yin Shan Ho.
+The URL of this blog is https://etc5523-2021.github.io/blog-ShaineHo/.
 
 ## Blog Post 1
 
 This assessment is due Fri Sep 3 2021 11.55PM AEST.
 
-My selected country is [FILL].
+My selected country is Austria.
 
-The relevant blog post for this assessment is in [FILL].html
+The relevant blog post for this assessment is in https://etc5523-2021.github.io/blog-ShaineHo/blog1.html
 
-- [ ] Selected a country
-- [ ] Website with R markdown 
-- [ ] A working URL
-- [ ] Data description
-- [ ] Short data story
-- [ ] Table 1
-- [ ] Table 2
-- [ ] Customised website with CSS
+- [x] Selected a country
+- [x] Website with R markdown 
+- [x] A working URL
+- [x] Data description
+- [x] Short data story
+- [x] Table 1
+- [x] Table 2
+- [x] Customised website with CSS
 - [ ] Submitted the entire blog to Moodle
 
 ## Blog Post 2

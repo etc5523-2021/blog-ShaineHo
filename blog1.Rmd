@@ -109,7 +109,7 @@ ggplotly(europe_map, height = 500, width = 800) %>%
 Based on the map, it is found that, Russia, France, United Kingdom, etc have more confirmed cases compare to the others. Whereas, the Southern European and Northern European got less number of confirmed. The possible reason is that the population in this countries are lower. The map above is an <mark>**interactive map**</mark> which includes the total number of confirmed up to 8/25/2021. You can move your mouse on the map to check on the cases confirmed in each countries.
 
 ## Percentage of cases confirmed
-<br>
+
 ```{r eruope-pct-cases}
 pct_confirmed_cases <- total_cases %>% 
   inner_join(europe, by = c("country" = "name")) %>% 
@@ -136,33 +136,21 @@ kable(caption = "Total number of cofirmed cases(per 10000 population), Last upda
   scroll_box(width = "100%", height = "300px") 
 
 ```
-<br>
-After adjusting the  confirmed cases by population, it's a different story. From the table of **total number of confirmed cases(per 10000 population)**, it is found that some of the Northern European like Sweden, Luxembourg are ranking high with the percentage of confirmed cases. Whereas, those who were having high total number of confirmed like Russia, France and Italy are ranking comparatively lower than before. 
 
+After adjusting the  confirmed cases by population, it's a different story. From the table of **total number of confirmed cases(per 10000 population)**, it is found that some of the Northern European like Sweden, Luxembourg are ranking high with the percentage of confirmed cases. Whereas, those who were having high total number of confirmed like Russia, France and Italy are ranking comparatively lower than before. 
+<br>
 # Situation in Austria
 
 ## Data description 
 
 There are totally two data set used in this blog. The first data set is the global cases information of the coronavirus. The second one is the status of vaccinations in European countries. Both of them were downloaded from github. The former is from  [RamiKrispin's github Resitory]('https://github.com/RamiKrispin/coronavirus/blob/master/data/coronavirus.rda'). The original data is maintained by [coronavirus package]("https://CRAN.R-project.org/package=coronavirus"). Whereas the later is from [owid's githu Repository]('https://github.com/owid/covid-19-data/blob/master/public/data/vaccinations/vaccinations.csv'). The original data is maintained by  [COVID-19 Data Repository by the Center for Systems Science and Engineering (CSSE)]("https://github.com/CSSEGISandData/COVID-19") at Johns Hopkins University Both of these two data sets are still updating the data, you can check on the the latest data from clicking the hyperlink above. 
 
-The raw data of **coronavirus data set ** contains `r nrow(coronavirus)` rows and `r ncol(coronavirus)` columns of data. While the **vaccinations data set** contains `r nrow(vaccinations)` rows and `r ncol(vaccinations)` columns.
+The raw data of **coronavirus data set** contains `r nrow(coronavirus)` rows and `r ncol(coronavirus)` columns of data. While the **vaccinations data set** contains `r nrow(vaccinations)` rows and `r ncol(vaccinations)` columns.
 
 ### Coronavirus cases
 
-```{r}
-covid_type <- c("date", "character", "character", "numeric", "numeric", "character", "numeric")
-covid_des <- describe(coronavirus) %>% 
-  cbind(covid_type)
-covid_des %>% 
-kable(caption = "Statistics summary of conronavirus data", 
-      align = "c", ) %>% 
-  row_spec(0, color = "white", background = "#E74C3C") %>% 
-  kable_styling(bootstrap_options = "striped", font_size = 12) %>% 
-  scroll_box(width = "100%")
-```
-<br>
 As the section mainly discuss the data in Austria. This country was filtered out from the list of countries. Meanwhile, as we only focus on one country and the the data doesn't contain the information of its states. Thus, these two colomns were removed. Then <mark>clean coronavirus data</mark> is shown as follow.
-<br>
+
 ```{r covid-table}
 aus_covid <- coronavirus %>% 
   filter(country == "Austria") %>% 
@@ -177,25 +165,40 @@ datatable(aus_covid,
                          autoWidth = TRUE))
 
 ```
+<br>
 
-
-### Vaccinations status
+### Vaccinations statistics
 
 ```{r}
 vaccine_type <- c("location", "iso_code", "date", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric")
 vaccine_des <- describe(vaccinations) %>% 
-  cbind(vaccine_type)
+  cbind(vaccine_type) %>% 
+    mutate(mean = round(mean,2),
+         sd = round(sd, 2),
+         median = round(median,2),
+         trimmed = round(trimmed,2),
+         mad = round(mad,2),
+         min = round(min,2),
+         max = round(max,2),
+         range = round(range,2),
+         skew = round(skew,2),
+         kurtosis = round(kurtosis,2),
+         se = round(se,2))
+
+vaccine_des <- vaccine_des[-c(1:3),]
+
 vaccine_des %>% 
+  mutate(vars = rep(1:11)) %>% 
 kable(caption = "Statistics summary of vaccination data", 
       align = "c", ) %>% 
   row_spec(0, color = "white", background = "#E74C3C") %>% 
   kable_styling(bootstrap_options = "striped", font_size = 12) %>% 
   scroll_box(width = "100%", height = "300px")
 ```
-<br>
+Same as before, Austria was filtered out from the list, and location and iso_code(country code) were removed as we only focuses on this country. The <mark>clean vaccination data</mark> is shown as follow.
 
-Same as before, Austria was filtered out from the list, and location and iso_code(country code) were removed as we only focuses on this country. Moreover, total_boosters and total_boosters_per_hundred columns were also removed as the values are all missing in this data set. The <mark>clean vaccination data</mark> is shown as follow.
-<br>
+### Vaccination status
+
 ```{r vaccine-table}
 aus_vaccines <- vaccinations %>% 
   filter(location == "Austria") %>% 
@@ -211,6 +214,7 @@ datatable(aus_vaccines,
 ```
 
 <br>
+
 ## Introduction of Austria
 
 ```{r austria-flag, out.extra='style="float:right; padding:5px"'}
@@ -260,7 +264,7 @@ ausvaccinations <- vaccinations %>%
   theme(axis.text.x = element_text(angle=20, hjust = 1))
   ggplotly(ausvaccinations, height = 400, width = 700)
 ```
-
+<br>
 From the bar chart above, it is found that people in Austria are quite active in injecting the vaccines. The decreasing trend from July was probably due to most of the citizens had fully injected the vaccines which had lowered the number of daily injection.
 
 # References

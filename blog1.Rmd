@@ -15,6 +15,8 @@ library(rnaturalearth)
 library(sf)
 library(plotly)
 library(kableExtra)
+library(DT)
+library(psych)
 ```
 
 
@@ -54,7 +56,7 @@ On average it takes 5–6 days from when someone is infected with the virus for 
 - chest pain or pressure
 - loss of speech or movement
 
-# Situation in Europe
+# Overview of situation in Europe
 
 ## Total Number of confirmed cases
 
@@ -107,7 +109,7 @@ ggplotly(europe_map, height = 500, width = 800) %>%
 Based on the map, it is found that, Russia, France, United Kingdom, etc have more confirmed cases compare to the others. Whereas, the Southern European and Northern European got less number of confirmed. The possible reason is that the population in this countries are lower. The map above is an <mark>**interactive map**</mark> which includes the total number of confirmed up to 8/25/2021. You can move your mouse on the map to check on the cases confirmed in each countries.
 
 ## Percentage of cases confirmed
-
+<br>
 ```{r eruope-pct-cases}
 pct_confirmed_cases <- total_cases %>% 
   inner_join(europe, by = c("country" = "name")) %>% 
@@ -124,23 +126,91 @@ Ranking = 1:length(pct_confirmed_cases$cases_pct)
 
 pct_confirmed_cases <- cbind(Ranking, pct_confirmed_cases)
 
-pct_confirmed_cases %>% 
-  kable(caption = "Total number of confirmed per 100000 population", 
+pct_confirmed_cases %>%   
+kable(caption = "Total number of cofirmed cases(per 10000 population), Last updated: 8/25/2021", 
       align = "c", 
       col.names = c("Ranking","Country", "Number of confirmed")) %>%  
   row_spec(0, color = "white", background = "#E74C3C") %>% 
   row_spec(21, background = "#5DADE2", color = "white") %>% 
   kable_styling(bootstrap_options = "striped", font_size = 12) %>% 
-  scroll_box(width = "100%", height = "300px")
+  scroll_box(width = "100%", height = "300px") 
 
 ```
-
-After adjusting the  confirmed cases by population, it's a different story. From the table above, it is found that some of the Northern European like Sweden, Luxembourg are ranking high with the percentage of confirmed cases. Whereas, those who were having high total number of confirmed like Russia, France and Italy are ranking comparatively lower than before. 
-
 <br>
+After adjusting the  confirmed cases by population, it's a different story. From the table of **total number of confirmed cases(per 10000 population)**, it is found that some of the Northern European like Sweden, Luxembourg are ranking high with the percentage of confirmed cases. Whereas, those who were having high total number of confirmed like Russia, France and Italy are ranking comparatively lower than before. 
 
 # Situation in Austria
 
+## Data description 
+
+There are totally two data set used in this blog. The first data set is the global cases information of the coronavirus. The second one is the status of vaccinations in European countries. Both of them were downloaded from github. The former is from  [RamiKrispin's github Resitory]('https://github.com/RamiKrispin/coronavirus/blob/master/data/coronavirus.rda'). The original data is maintained by [coronavirus package]("https://CRAN.R-project.org/package=coronavirus"). Whereas the later is from [owid's githu Repository]('https://github.com/owid/covid-19-data/blob/master/public/data/vaccinations/vaccinations.csv'). The original data is maintained by  [COVID-19 Data Repository by the Center for Systems Science and Engineering (CSSE)]("https://github.com/CSSEGISandData/COVID-19") at Johns Hopkins University Both of these two data sets are still updating the data, you can check on the the latest data from clicking the hyperlink above. 
+
+The raw data of **coronavirus data set ** contains `r nrow(coronavirus)` rows and `r ncol(coronavirus)` columns of data. While the **vaccinations data set** contains `r nrow(vaccinations)` rows and `r ncol(vaccinations)` columns.
+
+### Coronavirus cases
+
+```{r}
+covid_type <- c("date", "character", "character", "numeric", "numeric", "character", "numeric")
+covid_des <- describe(coronavirus) %>% 
+  cbind(covid_type)
+covid_des %>% 
+kable(caption = "Statistics summary of conronavirus data", 
+      align = "c", ) %>% 
+  row_spec(0, color = "white", background = "#E74C3C") %>% 
+  kable_styling(bootstrap_options = "striped", font_size = 12) %>% 
+  scroll_box(width = "100%", height = "300px")
+```
+<br>
+As the section mainly discuss the data in Austria. This country was filtered out from the list of countries. Meanwhile, as we only focus on one country and the the data doesn't contain the information of its states. Thus, these two colomns were removed. Then <mark>clean coronavirus data</mark> is shown as follow.
+<br>
+```{r covid-table}
+aus_covid <- coronavirus %>% 
+  filter(country == "Austria") %>% 
+  select(!province & !country)
+
+datatable(aus_covid,
+          filter = 'top',
+          class = 'vaccine',
+          options = list(pageLength = 5,
+                         scrollX = TRUE,
+                         auto_browse(TRUE),
+                         autoWidth = TRUE))
+
+```
+
+
+### Vaccinations status
+
+```{r}
+vaccine_type <- c("location", "iso_code", "date", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric")
+vaccine_des <- describe(vaccinations) %>% 
+  cbind(vaccine_type)
+covid_des %>% 
+kable(caption = "Statistics summary of vaccination data", 
+      align = "c", ) %>% 
+  row_spec(0, color = "white", background = "#E74C3C") %>% 
+  kable_styling(bootstrap_options = "striped", font_size = 12) %>% 
+  scroll_box(width = "100%", height = "300px")
+```
+<br>
+
+Same as before, Austria was filtered out from the list, and location and iso_code(country code) were removed as we only focuses on this country. Moreover, total_boosters and total_boosters_per_hundred columns were also removed as the values are all missing in this data set. The <mark>clean vaccination data</mark> is shown as follow.
+<br>
+```{r vaccine-table}
+aus_vaccines <- vaccinations %>% 
+  filter(location == "Austria") %>% 
+  select(!location & !iso_code & !total_boosters & ! total_boosters_per_hundred)
+
+datatable(aus_vaccines,
+          filter = 'top',
+          class = 'vaccine',
+          options = list(pageLength = 5,
+                         scrollX = TRUE,
+                         auto_browse(TRUE),
+                         autoWidth = TRUE))
+```
+
+<br>
 ## Introduction of Austria
 
 ```{r austria-flag, out.extra='style="float:right; padding:5px"'}
@@ -191,28 +261,36 @@ ausvaccinations <- vaccinations %>%
   ggplotly(ausvaccinations, height = 400, width = 700)
 ```
 
-From the barchart above, it is found that people in Austria are quite active in injecting the vaccines. The decreasing trend from July was probably due to most of the citizens had fully injected the vaccines which had lowered the number of daily injection.
+From the bar chart above, it is found that people in Austria are quite active in injecting the vaccines. The decreasing trend from July was probably due to most of the citizens had fully injected the vaccines which had lowered the number of daily injection.
 
-## Summary of cases and vaccinations status
+# References
 
-```{r}
-austriacovid %>% 
-  select(date, type, cases, daily_vaccinations) %>% 
-  filter(cases > 0) %>% 
-  pivot_wider(names_from = type,
-              values_from = cases) %>% 
-  kable(caption = "Detailed data of cases and vaccinations in Austria",
-      align = "c", 
-      col.names = c("Date", 
-                    "Daily vaccinations", 
-                    "Daily confirmed", 
-                    "Daily Death", 
-                    "Daily Recoverd")) %>%  
-  row_spec(0, color = "white", background = "#E74C3C") %>% 
-  kable_styling(bootstrap_options = "striped", font_size = 12) %>% 
-  scroll_box(width = "100%", height = "300px")
-```
+1. Information in English. (Federal Ministry, Republic of Austria). Retrieved August 28, 2021, from https://www.sozialministerium.at/en/Coronavirus/Information-in-English.html#coronavirus
 
-The table above is a summary of daily cases and vaccination status in Austria. The NAs in the Daily vaccinations column is due to the reason that the vaccines were not yet invented at the beginning of the Pandemic. The NA in that column remains until 2020-12-28 when the country started the vaccinations. Whereas the NAs in the daily cases columns indicate that there were no cases detected in that day. That is, no confirmed cases, no death cases or no recovered cases, respectively. 
+2. Austria: WHO Coronavirus Disease (COVID-19) Dashboard With Vaccination Data. (WHO). Retrieved from https://covid19.who.int/region/euro/country/at
 
+3. Rami Krispin and Jarrett Byrnes (2021). coronavirus: The 2019 Novel Coronavirus COVID-19
+  (2019-nCoV) Dataset. R package version 0.3.22.
+  https://CRAN.R-project.org/package=coronavirus
+  
+4.  Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Software, 4(43),
+  1686, https://doi.org/10.21105/joss.01686
 
+5.  Andy South (2017). rnaturalearth: World Map Data from Natural Earth. R package version
+  0.1.0. https://CRAN.R-project.org/package=rnaturalearth
+  
+6.  Pebesma, E., 2018. Simple Features for R: Standardized Support for Spatial Vector Data.
+  The R Journal 10 (1), 439-446, https://doi.org/10.32614/RJ-2018-009
+  
+7.  C. Sievert. Interactive Web-Based Data Visualization with R, plotly, and shiny. Chapman
+  and Hall/CRC Florida, 2020.
+
+8.  Hao Zhu (2021). kableExtra: Construct Complex Table with 'kable' and Pipe Syntax. R
+  package version 1.3.4. https://CRAN.R-project.org/package=kableExtra
+
+9.  Yihui Xie, Joe Cheng and Xianying Tan (2021). DT: A Wrapper of the JavaScript Library
+  'DataTables'. R package version 0.18. https://CRAN.R-project.org/package=DT
+
+10. Revelle, W. (2021) psych: Procedures for Personality and Psychological Research,
+  Northwestern University, Evanston, Illinois, USA, https://CRAN.R-project.org/package=psych
+  Version = 2.1.6,.

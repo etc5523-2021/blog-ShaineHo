@@ -158,7 +158,7 @@ kable(caption = "Statistics summary of conronavirus data",
       align = "c", ) %>% 
   row_spec(0, color = "white", background = "#E74C3C") %>% 
   kable_styling(bootstrap_options = "striped", font_size = 12) %>% 
-  scroll_box(width = "100%", height = "300px")
+  scroll_box(width = "100%")
 ```
 <br>
 As the section mainly discuss the data in Austria. This country was filtered out from the list of countries. Meanwhile, as we only focus on one country and the the data doesn't contain the information of its states. Thus, these two colomns were removed. Then <mark>clean coronavirus data</mark> is shown as follow.
@@ -185,7 +185,7 @@ datatable(aus_covid,
 vaccine_type <- c("location", "iso_code", "date", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric")
 vaccine_des <- describe(vaccinations) %>% 
   cbind(vaccine_type)
-covid_des %>% 
+vaccine_des %>% 
 kable(caption = "Statistics summary of vaccination data", 
       align = "c", ) %>% 
   row_spec(0, color = "white", background = "#E74C3C") %>% 

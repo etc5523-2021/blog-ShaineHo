@@ -274,7 +274,7 @@ datatable(aus_vaccines,
                          autoWidth = TRUE))
 ```
 
-[NOTE: The time range is from Jan 22, 2020 to the latest updated data on Aug 28, 2021]
+[NOTE: The time range is from 27 Dec, 2020 to the latest updated data on Aug 28, 2021]
 
 <br>
 

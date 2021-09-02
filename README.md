@@ -20,7 +20,7 @@ The relevant blog post for this assessment is in https://etc5523-2021.github.io/
 - [x] Table 1
 - [x] Table 2
 - [x] Customised website with CSS
-- [ ] Submitted the entire blog to Moodle
+- [x] Submitted the entire blog to Moodle
 
 ## Blog Post 2
 

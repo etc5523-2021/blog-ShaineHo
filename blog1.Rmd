@@ -27,7 +27,7 @@ vaccinations <- readr::read_csv(here::here("data/vaccinations.csv"))
 
 # Introduction
 
-Have you ever heard of the lyrics: "Imagine there's no countries. It isn't hard to do." from the song <Imagine> by John Lennon. It was not that difficult to imagine under the globalization before everything started in 2019. However, the world has changed since then. I believe that COVID-19 is already a familiar term to you all as it has affect all humankind since its outbreak, right? Due to the Pandemic, the borders had shut down one after another, the cities were locked down.  The living styles had also changed a lot, such as people are working online, students studying online which leads to a boom in online industry. Since it has been affecting us for a long period of time and it is still existing, it is necessary for us to know more about it and fight against the disaster together so as to restore the order of the world. 
+Have you ever heard of the lyrics: "Imagine there's no countries. It isn't hard to do." from the song "Imagine" by John Lennon. It was not that difficult to imagine under the globalization before everything started in 2019. However, the world has changed since then. I believe that COVID-19 is already a familiar term to you all as it has been affecting all humankind for nearly 2 years since its outbreak, right? Due to the Pandemic, the borders had shut down one after another, the cities were locked down.  The living styles had also changed a lot, such as people are working online, students are studying online which leads to a boom in online industry. Since it has been affecting us for a long period of time and it is still existing, it is necessary for us to know more about it and fight against the disaster together so as to restore the order of the world. 
 
 ## What is COVID-19?
 Covid-19 is an an infectious disease caused by severe acute respiratory coronavirus which have brought a pandemic to the mankind since late 2019. Up to late August, 2021, more than 200 million confirmed cases have been reported in countries and regions around the world. Meanwhile the numbers are still rising. 
@@ -132,11 +132,12 @@ pct_confirmed_cases <- cbind(Ranking, pct_confirmed_cases)
 pct_confirmed_cases %>%   
 kable(caption = "Total number of cofirmed cases(per 10000 population), Last updated: 8/25/2021", 
       align = "c", 
-      col.names = c("Ranking","Country", "Number of confirmed")) %>%  
+      col.names = c("Ranking","Country", "Number of confirmed")) %>% 
   row_spec(0, color = "white", background = "#E74C3C") %>% 
   row_spec(21, background = "Yellow", color = "grey") %>% 
   kable_styling(bootstrap_options = "striped", font_size = 12) %>% 
-  scroll_box(width = "100%", height = "300px") 
+  scroll_box(width = "100%", height = "300px")
+  
 
 ```
 
@@ -162,7 +163,7 @@ The raw data of **coronavirus data set** contains `r nrow(coronavirus)` rows and
 
 ### Vaccinations statistics
 
-```{r}
+```{r vaccine-statistics}
 vaccine_type <- c("location", "iso_code", "date", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric")
 vaccine_des <- describe(vaccinations) %>% 
   cbind(vaccine_type) %>% 
@@ -194,7 +195,7 @@ kable(caption = "Statistics summary of vaccination data",
 
 ### Trend on number of cases
 
-```{r aus-daily-caes}
+```{r aus-daily-caes, fig.height=6, fig.width=8}
 austriacovid <- coronavirus %>% 
   filter(country == "Austria") %>% 
   left_join(vaccinations, by = c("country" = "location", "date" = "date")) %>% 
@@ -218,12 +219,12 @@ Based on the trend of the cases, we can see that the trend of the confirmed, dea
 Later on, there was decrease in the number cases when the citizens started to inject the vaccines. This indicate the effectiveness of the vaccines. However, the number increases again from late February when there was the mutant virus such as type Alpha, Beta, Gamma, Delta which are the most dangerous spread around the world. The mutant virus had faster speed of spreading and lowered the effectiveness of the vaccines caused another boom of cases to the whole world. The details are shown in the table below.
 <br>
 
-### Detailed Coronavirus cases
+### Detailed Coronavirus cases data
 
 ```{r covid-table}
 aus_covid <- coronavirus %>% 
-  filter(country == "Austria") %>% 
-  select(!province & !country)
+  filter(country == "Austria", cases > 0) %>% 
+  select(!province & !country & !lat & !long)
 
 datatable(aus_covid,
           filter = 'top',
@@ -235,9 +236,13 @@ datatable(aus_covid,
 
 ```
 
-## Number of daily vaccinations
+[NOTE: The time range is from Jan 22, 2020 to the latest updated data on Aug 25, 2021, whereas the type includes confirmed, recovered and dead. Cases refer to the daily number of cases occur.]
 
-```{r aus-daily-vaccine, fig.height=3}
+<br> 
+
+### Number of daily vaccinations
+
+```{r aus-daily-vaccine, fig.height=3, fig.width=6}
 ausvaccinations <- vaccinations %>% 
   filter(location == "Austria") %>% 
   ggplot(aes(x = date,
@@ -268,6 +273,10 @@ datatable(aus_vaccines,
                          auto_browse(TRUE),
                          autoWidth = TRUE))
 ```
+
+[NOTE: The time range is from Jan 22, 2020 to the latest updated data on Aug 28, 2021]
+
+<br>
 
 
 # References

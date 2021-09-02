@@ -27,12 +27,14 @@ vaccinations <- readr::read_csv(here::here("data/vaccinations.csv"))
 
 # Introduction
 
-Have you ever heard of the lyrics: "Imagine there's no countries. It isn't hard to do." from Imagine by John Lennon. It was not that difficult to imagine under the globalization before everything started in 2019. However, the world has changed since then. I believe that COVID-19 is already a familiar term to you all as it has affect all humankind since its outbreak, right? Due to the Pandemic, the borders had shut down on after another, the cities were locked down.  The living styles had also changed a lot, such as people work online, students study online which leads to a boom in online industry. Since it has been affecting us for a long period of time and it is still existing, it is necessary for us get to know more about it and fight against the disaster together to restore the order of the world. 
+Have you ever heard of the lyrics: "Imagine there's no countries. It isn't hard to do." from the song <Imagine> by John Lennon. It was not that difficult to imagine under the globalization before everything started in 2019. However, the world has changed since then. I believe that COVID-19 is already a familiar term to you all as it has affect all humankind since its outbreak, right? Due to the Pandemic, the borders had shut down one after another, the cities were locked down.  The living styles had also changed a lot, such as people are working online, students studying online which leads to a boom in online industry. Since it has been affecting us for a long period of time and it is still existing, it is necessary for us to know more about it and fight against the disaster together so as to restore the order of the world. 
 
 ## What is COVID-19?
-Covid-19 is an an infectious disease caused by severe acute respiratory coronavirus which had brought a pandemic to the mankind since late 2019. As of August, 2021, more than 200 million confirmed cases have been reported in countries and regions around the world meanwhile the numbers are still rising. 
+Covid-19 is an an infectious disease caused by severe acute respiratory coronavirus which have brought a pandemic to the mankind since late 2019. Up to late August, 2021, more than 200 million confirmed cases have been reported in countries and regions around the world. Meanwhile the numbers are still rising. 
 
-On average it takes 5–6 days from when someone is infected with the virus for symptoms to show, however it can take up to 14 days. The symptoms include: 
+## What are the symptoms of COVID-19?
+
+On average, it takes 5–6 days from someone who has infected with the virus for symptoms to show, however it can take up to 14 days. The symptoms include: 
 
 **Most common symptoms:**
 
@@ -104,11 +106,12 @@ ggplotly(europe_map, height = 500, width = 800) %>%
    layout(xaxis = list(showticklabels = FALSE, title = ""),
 
                     yaxis = list(showticklabels = FALSE, title = ""))
+
 ```
 
 Based on the map, it is found that, Russia, France, United Kingdom, etc have more confirmed cases compare to the others. Whereas, the Southern European and Northern European got less number of confirmed. The possible reason is that the population in this countries are lower. The map above is an <mark>**interactive map**</mark> which includes the total number of confirmed up to 8/25/2021. You can move your mouse on the map to check on the cases confirmed in each countries.
 
-## Percentage of cases confirmed
+## Proportion of cases confirmed
 
 ```{r eruope-pct-cases}
 pct_confirmed_cases <- total_cases %>% 
@@ -131,41 +134,31 @@ kable(caption = "Total number of cofirmed cases(per 10000 population), Last upda
       align = "c", 
       col.names = c("Ranking","Country", "Number of confirmed")) %>%  
   row_spec(0, color = "white", background = "#E74C3C") %>% 
-  row_spec(21, background = "#5DADE2", color = "white") %>% 
+  row_spec(21, background = "Yellow", color = "grey") %>% 
   kable_styling(bootstrap_options = "striped", font_size = 12) %>% 
   scroll_box(width = "100%", height = "300px") 
 
 ```
 
-After adjusting the  confirmed cases by population, it's a different story. From the table of **total number of confirmed cases(per 10000 population)**, it is found that some of the Northern European like Sweden, Luxembourg are ranking high with the percentage of confirmed cases. Whereas, those who were having high total number of confirmed like Russia, France and Italy are ranking comparatively lower than before. 
+After adjusting the  confirmed cases by population, it's a different story. From the table of **total number of confirmed cases(per 10000 population)**, it is found that some of the Northern Europeans like Sweden, Luxembourg are ranking high with the percentage of confirmed cases. Whereas, those who were having high total number of confirmed like Russia, France and Italy are ranking comparatively lower than before.  While our focus country **Austria** is ranking 21/43 which is nearly the median of the European states.
 <br>
+
 # Situation in Austria
+
+## Introduction of Austria
+
+```{r austria-flag, out.extra='style="float:right; padding:5px"'}
+knitr::include_graphics("http://98.129.95.58/public/anthems/images/Austria_flag.jpg")
+```
+Austria is located in Central Europe. It is bordered by the Czech Republic and Germany to the north, Slovakia and Hungary to the east, Slovenia and Italy to the south, and Switzerland and Liechtenstein to the west. 
+
+Vienna is the capital city of Austria which is always associated with music. It is a dreamland for those who are in love of classical music. Since I have learned playing piano when I was young, I have been practicing a lot of songs from the Austrian musician like Ludwig van Beethoven, Franz Joseph Haydn, Wolfgang Amadeus Mozart, etc. Austria is always where I wanted to go. And this is the reason why I am interested to study the COVID-19 situation in this country. So as to know when will we be able to enter Austria.
 
 ## Data description 
 
 There are totally two data set used in this blog. The first data set is the global cases information of the coronavirus. The second one is the status of vaccinations in European countries. Both of them were downloaded from github. The former is from  [RamiKrispin's github Resitory]('https://github.com/RamiKrispin/coronavirus/blob/master/data/coronavirus.rda'). The original data is maintained by [coronavirus package]("https://CRAN.R-project.org/package=coronavirus"). Whereas the later is from [owid's githu Repository]('https://github.com/owid/covid-19-data/blob/master/public/data/vaccinations/vaccinations.csv'). The original data is maintained by  [COVID-19 Data Repository by the Center for Systems Science and Engineering (CSSE)]("https://github.com/CSSEGISandData/COVID-19") at Johns Hopkins University Both of these two data sets are still updating the data, you can check on the the latest data from clicking the hyperlink above. 
 
 The raw data of **coronavirus data set** contains `r nrow(coronavirus)` rows and `r ncol(coronavirus)` columns of data. While the **vaccinations data set** contains `r nrow(vaccinations)` rows and `r ncol(vaccinations)` columns.
-
-### Coronavirus cases
-
-As the section mainly discuss the data in Austria. This country was filtered out from the list of countries. Meanwhile, as we only focus on one country and the the data doesn't contain the information of its states. Thus, these two colomns were removed. Then <mark>clean coronavirus data</mark> is shown as follow.
-
-```{r covid-table}
-aus_covid <- coronavirus %>% 
-  filter(country == "Austria") %>% 
-  select(!province & !country)
-
-datatable(aus_covid,
-          filter = 'top',
-          class = 'vaccine',
-          options = list(pageLength = 5,
-                         scrollX = TRUE,
-                         auto_browse(TRUE),
-                         autoWidth = TRUE))
-
-```
-<br>
 
 ### Vaccinations statistics
 
@@ -195,36 +188,11 @@ kable(caption = "Statistics summary of vaccination data",
   kable_styling(bootstrap_options = "striped", font_size = 12) %>% 
   scroll_box(width = "100%", height = "300px")
 ```
-Same as before, Austria was filtered out from the list, and location and iso_code(country code) were removed as we only focuses on this country. The <mark>clean vaccination data</mark> is shown as follow.
-
-### Vaccination status
-
-```{r vaccine-table}
-aus_vaccines <- vaccinations %>% 
-  filter(location == "Austria") %>% 
-  select(!location & !iso_code & !total_boosters & ! total_boosters_per_hundred)
-
-datatable(aus_vaccines,
-          filter = 'top',
-          class = 'vaccine',
-          options = list(pageLength = 5,
-                         scrollX = TRUE,
-                         auto_browse(TRUE),
-                         autoWidth = TRUE))
-```
-
 <br>
 
-## Introduction of Austria
+## Overall trend of the COVID-19 situation in Austria
 
-```{r austria-flag, out.extra='style="float:right; padding:5px"'}
-knitr::include_graphics("http://98.129.95.58/public/anthems/images/Austria_flag.jpg")
-```
-Austria is located in Central Europe. It is bordered by the Czech Republic and Germany to the north, Slovakia and Hungary to the east, Slovenia and Italy to the south, and Switzerland and Liechtenstein to the west. 
-
-Vienna is the capital city of Austria which is always associated with music. It is a dreamland for those who are in love of classical music. Since I have learned playing piano when I was young, I have been practicing a lot of songs from the Austrian musician like Ludwig van Beethoven, Franz Joseph Haydn, Wolfgang Amadeus Mozart, etc. Austria is always where I wanted to go. And this is the reason why I am interested to study the COVID-19 situation in this country. So as to know when will we be able to enter Austria.
-
-## Overall trend of cases in Austria
+### Trend on number of cases
 
 ```{r aus-daily-caes}
 austriacovid <- coronavirus %>% 
@@ -247,7 +215,25 @@ auscovid_cases <- austriacovid %>%
 
 Based on the trend of the cases, we can see that the trend of the confirmed, death and recovery cases following the same trend. The number of cases were very low from the beginning of the cases entering the country and remained low until late September 2020. There was spark of the cases since then and the number started to drop from the early December. The possible reason was due to the season to winter when the virus is more likely to remain active.
 
-Later on, there was decrease in the number cases when the citizens started to inject the vaccines. This indicate the effectiveness of the vaccines. However, the number increases again from late February when there was the mutant virus such as type Alpha, Beta, Gamma, Delta which are the most dangerous spread around the world. The mutant virus had faster speed of spreading and lowered the effectiveness of the vaccines caused another boom of cases to the whole world. 
+Later on, there was decrease in the number cases when the citizens started to inject the vaccines. This indicate the effectiveness of the vaccines. However, the number increases again from late February when there was the mutant virus such as type Alpha, Beta, Gamma, Delta which are the most dangerous spread around the world. The mutant virus had faster speed of spreading and lowered the effectiveness of the vaccines caused another boom of cases to the whole world. The details are shown in the table below.
+<br>
+
+### Detailed Coronavirus cases
+
+```{r covid-table}
+aus_covid <- coronavirus %>% 
+  filter(country == "Austria") %>% 
+  select(!province & !country)
+
+datatable(aus_covid,
+          filter = 'top',
+          class = 'vaccine',
+          options = list(pageLength = 5,
+                         scrollX = TRUE,
+                         auto_browse(TRUE),
+                         autoWidth = TRUE))
+
+```
 
 ## Number of daily vaccinations
 
@@ -265,7 +251,24 @@ ausvaccinations <- vaccinations %>%
   ggplotly(ausvaccinations, height = 400, width = 700)
 ```
 <br>
-From the bar chart above, it is found that people in Austria are quite active in injecting the vaccines. The decreasing trend from July was probably due to most of the citizens had fully injected the vaccines which had lowered the number of daily injection.
+From the bar chart above, it is found that people in Austria are quite active in injecting the vaccines. The decreasing trend from July was probably due to most of the citizens had fully injected the vaccines which had lowered the number of daily injection. The detail data is shown as follow.
+
+### Detailed vaccination status data
+
+```{r vaccine-table}
+aus_vaccines <- vaccinations %>% 
+  filter(location == "Austria") %>% 
+  select(!location & !iso_code & !total_boosters & ! total_boosters_per_hundred)
+
+datatable(aus_vaccines,
+          filter = 'top',
+          class = 'vaccine',
+          options = list(pageLength = 5,
+                         scrollX = TRUE,
+                         auto_browse(TRUE),
+                         autoWidth = TRUE))
+```
+
 
 # References
 

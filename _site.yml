@@ -6,8 +6,8 @@ navbar:
        href: index.html
      - text: "Blog 1"
        href: blog1.html
-     - text: ""
-       href: 
+     - text: "Blog2"
+       href: blog2.html
 output:
   html_document:
     theme: cerulean

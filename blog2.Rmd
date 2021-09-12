@@ -1,0 +1,131 @@
+---
+title: "Covid-19 in Argentina"
+author: "Yin Shan Ho"
+date: "9/12/2021"
+output: 
+ html_document:
+    theme: cerulean
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(tidyverse)
+library(rnaturalearth)
+library(sf)
+library(plotly)
+library(kableExtra)
+```
+
+```{r load-data}
+load(here::here("data/coronavirus_sep11.rda")) 
+vaccinations <- readr::read_csv(here::here("data/vaccinations_sep11.csv"))
+```
+
+
+```{css, echo = FALSE}
+h1,h2,h3,h4,h5{
+  color: #2fa4e7;
+}
+.table-striped>tbody>tr:nth-child(even)>td, 
+.table-striped>tbody>tr:nth-child(even)>th {
+   background-color: #CAE8FC;
+    
+```
+
+# Introduction
+
+```{r argentin-flag, out.extra='style="float:right; padding:5px"', out.height='50%', out.width='50%'}
+knitr::include_graphics("https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/3cc36829-de7b-4e0e-9ab5-ceeac402f90b/dckb2zg-6006371b-f082-43d9-96ab-eb62b216050c.png/v1/fill/w_1192,h_670,strp/lionel_messi_argentina_flag_background_wpap_by_hellofranklin_dckb2zg-pre.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzNjYzM2ODI5LWRlN2ItNGUwZS05YWI1LWNlZWFjNDAyZjkwYlwvZGNrYjJ6Zy02MDA2MzcxYi1mMDgyLTQzZDktOTZhYi1lYjYyYjIxNjA1MGMucG5nIiwiaGVpZ2h0IjoiPD05MDAiLCJ3aWR0aCI6Ijw9MTYwMCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS53YXRlcm1hcmsiXSwid21rIjp7InBhdGgiOiJcL3dtXC8zY2MzNjgyOS1kZTdiLTRlMGUtOWFiNS1jZWVhYzQwMmY5MGJcL2hlbGxvZnJhbmtsaW4tNC5wbmciLCJvcGFjaXR5Ijo5NSwicHJvcG9ydGlvbnMiOjAuNDUsImdyYXZpdHkiOiJjZW50ZXIifX0.YTXSwB6fqNQuOVRLnhoxKxfNuNteuqaFMBrPf0CSB3w")
+```
+
+When thinking of Argentina, my first impression is football. Until now, I can still remember when I first learnt the Argentine football team in 2006 when was the year of FIFA World Cup in Germany. It was the first time that Lionel Messi played in the FIFA World Cup. Also, it was the first time that I had watched the whole match when Argentina had hammered Serbia and Montenegro 6–0 in the group stage. It left me a strong impression to their team and kept on watching their matches til now. I always wanted to watch a match host by Argentina and join the enthusiasm of their fans. However, it is difficult to archive under the pandemic situation. Especially when I saw the news that Argentina had a great number of confirmed. Then, how is the current situation?
+
+## Data description 
+
+There are totally two data set used in this blog. The first one is the global cases information of the coronavirus. The second one is the global status of vaccinations. Both of them were downloaded from github. The former is from  [RamiKrispin's github Resitory]('https://github.com/RamiKrispin/coronavirus/blob/master/data/coronavirus.rda'). The original data is maintained by [coronavirus package]("https://CRAN.R-project.org/package=coronavirus"). Whereas the later is from [owid's githu Repository]('https://github.com/owid/covid-19-data/blob/master/public/data/vaccinations/vaccinations.csv'). The original data is maintained by  [COVID-19 Data Repository by the Center for Systems Science and Engineering (CSSE)]("https://github.com/CSSEGISandData/COVID-19") at Johns Hopkins University. The data sets are up to September 11, 2021. While both of these two data sets are still updating daily, you can check on the the latest data from clicking the hyperlink above. 
+
+The raw data of **coronavirus data set** contains `r nrow(coronavirus)` rows and `r ncol(coronavirus)` columns of data. While the **vaccinations data set** contains `r nrow(vaccinations)` rows and `r ncol(vaccinations)` columns. 
+
+# Situation in South America
+
+## Overview situation of the continent
+
+```{r filter data, include = FALSE}
+# import data of South America
+south_america <- ne_countries(continent = "south america", returnclass = "sf", scale = "medium")%>% 
+  select(name, pop_est)
+
+# check unmatched data
+south_america %>% 
+  anti_join(coronavirus, by = c("name" = "country"))
+
+### Since, there are no unmatched data, no rename is required for the following joinings
+total_cases <- coronavirus %>%
+  group_by(country, type, lat, long) %>% 
+  summarise(cases = sum(cases)/1000000)
+
+# join two data sets together 
+sa_covid_total <- total_cases %>% 
+  right_join(south_america, by = c("country" = "name")) %>% 
+  mutate(cases = round(cases,2)) %>% 
+  filter(type == "confirmed")
+
+```
+
+
+```{r south-america-map}
+sa_map <- sa_covid_total %>% 
+  ggplot()+
+  geom_sf(mapping = aes(geometry = geometry, fill = cases), size = 0.3)+
+  geom_text(data = sa_covid_total,aes(x= long, y = lat, label = country),color = "transparent" )+
+  scale_fill_distiller(palette = "Blues", na.value = "white", direction = 1)+
+
+  labs(title = "Total Number of cases confirmed in South America(millions), updated: Sep 11 2021",
+       fill = "") +
+  theme_bw()+
+  theme(panel.grid.major = element_line(colour = "transparent"))
+
+ggplotly(sa_map, height = 500, width = 800) %>% 
+   layout(xaxis = list(showticklabels = FALSE, title = ""),
+
+                    yaxis = list(showticklabels = FALSE, title = ""))
+
+```
+
+Based on the map above, it is fond that, the total number of cases confirmed is pretty high in the whole continent. The highest number is found in Brazil with 21 millions, whereas **Argentina is the second highest in the continent** with 5 millions total number of cases confirmed. 
+
+**[NOTE: The map is interactive, feel free to move around and look for more information!]**
+
+## Population adjusted number of confirmed
+
+```{r eruope-pct-cases}
+pct_confirmed_cases <- total_cases %>% 
+  inner_join(south_america, by = c("country" = "name")) %>% 
+  group_by(type, country) %>% 
+  summarise(cases_pct = 1000000*1000000*cases/pop_est) %>% 
+  mutate(cases_pct = round(cases_pct,0))%>% 
+  filter(type == "confirmed") %>% 
+  ungroup() %>% 
+  group_by(country) %>% 
+  summarise(cases_pct = sum(cases_pct)) %>% 
+  arrange(desc(cases_pct)) %>% 
+  mutate(cases_pct = format(cases_pct, big.mark = ","))
+
+Ranking = 1:length(pct_confirmed_cases$cases_pct)
+
+pct_confirmed_cases <- cbind(Ranking, pct_confirmed_cases)
+
+pct_confirmed_cases %>%   
+kable(caption = "Total Number of cofirmed cases(per million population), Last updated: Sep 11 2021", 
+      align = "c", 
+      col.names = c("Ranking","Country", "Number of confirmed")) %>% 
+  row_spec(0, color = "white", background = " #2fa4e7") %>% 
+  row_spec(1, bold = TRUE, color = "#2fa4e7", background = "yellow") %>%  
+  kable_styling(bootstrap_options = "striped", font_size = 12) %>% 
+  scroll_box(width = "100%", height = "300px")
+  
+```
+
+However, the total number of the cases confirmed may not be accurate enough to describe the seriousness of the situation as the higher number of confirmed maybe due to the higher population. So, the number of the confirmed cases was adjusted base on the population in the South American countries. After adjustment, it is found that, **the number of confirmed cases is the highest in the continent by 127,674 per million population** which indicates that three are **around 13% of the Argentine population had confirmed to be infected by the COVID-19**.

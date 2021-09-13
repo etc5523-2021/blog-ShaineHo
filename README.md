@@ -32,8 +32,8 @@ The relevant blog post for this assessment is in https://etc5523-2021.github.io/
 
 - [x] Selected a new country
 - [x] Data Story 1
-- [ ] Data Story 2
+- [x] Data Story 2
 - [x] Graph 1
-- [ ] Graph 2
+- [x] Graph 2
 - [ ] Submitted the entire blog to Moodle
 

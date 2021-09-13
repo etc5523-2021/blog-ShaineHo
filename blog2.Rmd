@@ -16,6 +16,8 @@ library(rnaturalearth)
 library(sf)
 library(plotly)
 library(kableExtra)
+library(lubridate)
+library(gganimate)
 ```
 
 ```{r load-data}
@@ -36,17 +38,56 @@ h1,h2,h3,h4,h5{
 
 # Introduction
 
-```{r argentin-flag, out.extra='style="float:right; padding:5px"', out.height='50%', out.width='50%'}
+```{r argentin-flag, out.extra='style="float:right; padding:5px"', out.height='60%', out.width='50%'}
 knitr::include_graphics("https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/3cc36829-de7b-4e0e-9ab5-ceeac402f90b/dckb2zg-6006371b-f082-43d9-96ab-eb62b216050c.png/v1/fill/w_1192,h_670,strp/lionel_messi_argentina_flag_background_wpap_by_hellofranklin_dckb2zg-pre.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzNjYzM2ODI5LWRlN2ItNGUwZS05YWI1LWNlZWFjNDAyZjkwYlwvZGNrYjJ6Zy02MDA2MzcxYi1mMDgyLTQzZDktOTZhYi1lYjYyYjIxNjA1MGMucG5nIiwiaGVpZ2h0IjoiPD05MDAiLCJ3aWR0aCI6Ijw9MTYwMCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS53YXRlcm1hcmsiXSwid21rIjp7InBhdGgiOiJcL3dtXC8zY2MzNjgyOS1kZTdiLTRlMGUtOWFiNS1jZWVhYzQwMmY5MGJcL2hlbGxvZnJhbmtsaW4tNC5wbmciLCJvcGFjaXR5Ijo5NSwicHJvcG9ydGlvbnMiOjAuNDUsImdyYXZpdHkiOiJjZW50ZXIifX0.YTXSwB6fqNQuOVRLnhoxKxfNuNteuqaFMBrPf0CSB3w")
 ```
 
-When thinking of Argentina, my first impression is football. Until now, I can still remember when I first learnt the Argentine football team in 2006 when was the year of FIFA World Cup in Germany. It was the first time that Lionel Messi played in the FIFA World Cup. Also, it was the first time that I had watched the whole match when Argentina had hammered Serbia and Montenegro 6–0 in the group stage. It left me a strong impression to their team and kept on watching their matches til now. I always wanted to watch a match host by Argentina and join the enthusiasm of their fans. However, it is difficult to archive under the pandemic situation. Especially when I saw the news that Argentina had a great number of confirmed. Then, how is the current situation?
+When thinking of Argentina, football is the word first come up to my mind. Up to now, I can still remember the time that I first knew the Argentine football team in the 2006 FIFA World Cup held by Germany. It was the first time that Lionel Messi played in the FIFA World Cup. Also, it was the first time that I had watched the whole match when Argentina hammered Serbia and Montenegro 6–0 in the group stage. It left me a strong impression to their team and kept on watching their matches til now. I always wanted to watch a match hosted by Argentina, to join them, to cheer them up and feel their fans' enthusiasm. However, it is difficult to archive under the pandemic situation. Especially when I saw the news that Argentina had a great number of confirmed. Then, what is the actual situation of COVID-19 there? The following contents will explore the covid-19 data in Argentina.
 
-## Data description 
+# Data description 
 
-There are totally two data set used in this blog. The first one is the global cases information of the coronavirus. The second one is the global status of vaccinations. Both of them were downloaded from github. The former is from  [RamiKrispin's github Resitory]('https://github.com/RamiKrispin/coronavirus/blob/master/data/coronavirus.rda'). The original data is maintained by [coronavirus package]("https://CRAN.R-project.org/package=coronavirus"). Whereas the later is from [owid's githu Repository]('https://github.com/owid/covid-19-data/blob/master/public/data/vaccinations/vaccinations.csv'). The original data is maintained by  [COVID-19 Data Repository by the Center for Systems Science and Engineering (CSSE)]("https://github.com/CSSEGISandData/COVID-19") at Johns Hopkins University. The data sets are up to September 11, 2021. While both of these two data sets are still updating daily, you can check on the the latest data from clicking the hyperlink above. 
+There are totally two data set used in this blog. The first one is the global cases information of the coronavirus. The second one is the global status of vaccinations. Both of them were downloaded from github. The coronavirus dataset is from  [RamiKrispin's github Resitory]('https://github.com/RamiKrispin/coronavirus/blob/master/data/coronavirus.rda'). The original data is maintained by [coronavirus package]("https://CRAN.R-project.org/package=coronavirus"). The raw data contains `r nrow(coronavirus)` rows and `r ncol(coronavirus)` columns of data. The clean data description is as follow.
 
-The raw data of **coronavirus data set** contains `r nrow(coronavirus)` rows and `r ncol(coronavirus)` columns of data. While the **vaccinations data set** contains `r nrow(vaccinations)` rows and `r ncol(vaccinations)` columns. 
+```{r convid-des}
+tribble(
+  ~Number, ~variable, ~data_type, ~description,
+  1, "date", "Date", "The date reported",
+  2, "province", "Character", "Counrty code",
+  3, "country", "Character", "Country name",
+  4, "lat", "Double", "Region of country in WHO",
+  5, "long", "Double", "Daily new cases",
+  6, "type", "Character", "Cumulative cases",
+  7, "cases", "Nmeric", "Daily new deaths"
+) %>%
+  as.data.frame() %>% 
+  kable(caption = "Data Description of coronavirus dataset",
+      align = "c", 
+      col.names = c("Number", "Variable","Data Type", "Description")) %>%
+  row_spec(0, color = "white", background = " #2fa4e7") %>% 
+  kable_styling(bootstrap_options = "striped", font_size = 12)
+  
+```
+
+Whereas the vacciation data set is from [owid's githu Repository]('https://github.com/owid/covid-19-data/blob/master/public/data/vaccinations/vaccinations.csv'). The original data is maintained by  [COVID-19 Data Repository by the Center for Systems Science and Engineering (CSSE)]("https://github.com/CSSEGISandData/COVID-19") at Johns Hopkins University. 
+ While the raw contains `r nrow(vaccinations)` rows and `r ncol(vaccinations)` columns. The clean data description is as follow.
+
+```{r vaccine-desc}
+tribble(
+  ~Number, ~variable, ~data_type, ~description,
+  1, "date", "Date", "The date reported",
+  2, "people_vaccinated","Numeric",  "Number of people vaccinated at least 1 dose",
+  3, "people_fully_vaccinated","Numeric",  "Number of people fully vaccinated"
+) %>%
+  as.data.frame() %>% 
+  as.data.frame() %>% 
+  kable(caption = "Data Description of vaccination dataset",
+      align = "c", 
+      col.names = c("Number", "Variable","Data Type", "Description")) %>%
+  row_spec(0, color = "white", background = " #2fa4e7") %>% 
+  kable_styling(bootstrap_options = "striped", font_size = 12)
+```
+
+The data sets are up to September 11, 2021. While both of these two data sets are still updating daily, you can check on the the latest data from clicking the hyperlink above. 
 
 # Situation in South America
 
@@ -63,7 +104,10 @@ south_america %>%
 
 ### Since, there are no unmatched data, no rename is required for the following joinings
 total_cases <- coronavirus %>%
-  group_by(country, type, lat, long) %>% 
+  mutate(year = year(date), 
+         month = month(date), 
+         day = day(date)) %>% 
+  group_by(country, type, lat, long, year) %>% 
   summarise(cases = sum(cases)/1000000)
 
 # join two data sets together 
@@ -76,12 +120,13 @@ sa_covid_total <- total_cases %>%
 
 
 ```{r south-america-map}
+
 sa_map <- sa_covid_total %>% 
   ggplot()+
   geom_sf(mapping = aes(geometry = geometry, fill = cases), size = 0.3)+
   geom_text(data = sa_covid_total,aes(x= long, y = lat, label = country),color = "transparent" )+
+  xlim(-100, -30)+
   scale_fill_distiller(palette = "Blues", na.value = "white", direction = 1)+
-
   labs(title = "Total Number of cases confirmed in South America(millions), updated: Sep 11 2021",
        fill = "") +
   theme_bw()+
@@ -89,10 +134,9 @@ sa_map <- sa_covid_total %>%
 
 ggplotly(sa_map, height = 500, width = 800) %>% 
    layout(xaxis = list(showticklabels = FALSE, title = ""),
-
                     yaxis = list(showticklabels = FALSE, title = ""))
-
-```
+  
+```  
 
 Based on the map above, it is fond that, the total number of cases confirmed is pretty high in the whole continent. The highest number is found in Brazil with 21 millions, whereas **Argentina is the second highest in the continent** with 5 millions total number of cases confirmed. 
 
@@ -129,3 +173,95 @@ kable(caption = "Total Number of cofirmed cases(per million population), Last up
 ```
 
 However, the total number of the cases confirmed may not be accurate enough to describe the seriousness of the situation as the higher number of confirmed maybe due to the higher population. So, the number of the confirmed cases was adjusted base on the population in the South American countries. After adjustment, it is found that, **the number of confirmed cases is the highest in the continent by 127,674 per million population** which indicates that three are **around 13% of the Argentine population had confirmed to be infected by the COVID-19**.
+
+# Situation in Argentina
+
+## Trend of daily cases 
+
+```{r arg-daily-cases, fig.height=6, fig.width=8}
+argentinecovid <- coronavirus %>% 
+  filter(country == "Argentina") %>% 
+  left_join(vaccinations, by = c("country" = "location", "date" = "date")) %>% 
+  mutate(date = as.Date(date))
+
+blue_colors <- c(confirmed = '#079CF5', death = '#72BEEC', recovered ='#C5E5F8')
+
+arg_cases <- argentinecovid %>% 
+  filter(cases >=0) %>% 
+  ggplot(aes(x = date, y = cases, fill= type)) + 
+  geom_col(stat = "identity") +
+  facet_wrap(~type, ncol = 1, scales = "free_y")+
+  ylab("Number of cases")+
+  xlab("Date")+
+  scale_x_date(date_breaks = "60 days",date_labels = "%d-%m-%Y")+
+  scale_y_continuous(labels = ~scales::number(.,big.mark = ","))+
+  scale_fill_manual(values=blue_colors)+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle=20, hjust = 1))
+
+ggplotly(arg_cases)
+  
+```
+
+It is found that there are **totally 3 waves of the coronavrius cases confirmed increases**. The first wave started from June 2020 and reached maximum at mid October 2020. While the second wave started right after the first wave in mid December 2020, however it is less serious compare to the last wave started in March 2021 when the mutant virus started to spread around the world. This also caused the third wave of global pandemic. Luckily, **a decreasing trend is observed from June 2021**. Even the daily confirmed rate is still around 3000, it is comparatively better compare to **the highest period with 40000 daily confirmed in late May 2021**!
+
+## Trend of Vaccination Status
+
+```{r arg-vaccines-status}
+arg_vaccine <- vaccinations %>% 
+  filter(location == 'Argentina')%>% 
+  mutate(people_vaccinated = people_vaccinated/1000000,
+         people_fully_vaccinated = people_fully_vaccinated/1000000) %>% 
+  ggplot(aes(x = date)) +
+  geom_area(aes(y = people_vaccinated), fill = "#C5E5F8") +
+  geom_area(aes(y = people_fully_vaccinated), fill = "#72BEEC") +
+  scale_x_date(breaks = "60 days") +
+  labs(x = "Date",
+       y = "Number of people vaccinated",
+       title = "Vaccination status in Argentina(in millions)")+
+   annotate("text",
+           x = as.Date("2021-08-01"),
+           y = 2,
+           label = "fully vaccinated") +
+  annotate("text",
+           x = as.Date("2021-07-08"),
+           y = 10,
+           label = "vaccinated at least 1 dose") +
+  theme(axis.text.x = element_text(angle=20, hjust = 1))+
+  theme_minimal()+    
+  transition_reveal(date)
+
+animate(arg_vaccine, fps = 10)
+
+```
+
+It is found that the there was a sharp increase to the trend of people injected at least 1 dose of the vaccinations. Moreover, steeper trend of increase in people vaccinated at least 1 dose as well as the larger proportion of people fully vaccinated were oberserved from June 2021. This also explained the effectiveness of the vaccines as there was a great decrease in the number of confirmed cases since then.
+
+# References
+
+1. Argentina: WHO Coronavirus Disease (COVID-19) Dashboard With Vaccination Data. (WHO). Retrieved from https://covid19.who.int/region/amro/country/ar
+
+2. Rami Krispin and Jarrett Byrnes (2021). coronavirus: The 2019 Novel Coronavirus COVID-19
+  (2019-nCoV) Dataset. R package version 0.3.22.
+  https://CRAN.R-project.org/package=coronavirus
+  
+3.  Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Software, 4(43),
+  1686, https://doi.org/10.21105/joss.01686
+
+4.  Andy South (2017). rnaturalearth: World Map Data from Natural Earth. R package version
+  0.1.0. https://CRAN.R-project.org/package=rnaturalearth
+  
+5.  Pebesma, E., 2018. Simple Features for R: Standardized Support for Spatial Vector Data.
+  The R Journal 10 (1), 439-446, https://doi.org/10.32614/RJ-2018-009
+  
+6.  C. Sievert. Interactive Web-Based Data Visualization with R, plotly, and shiny. Chapman
+  and Hall/CRC Florida, 2020.
+
+7.  Hao Zhu (2021). kableExtra: Construct Complex Table with 'kable' and Pipe Syntax. R
+  package version 1.3.4. https://CRAN.R-project.org/package=kableExtra
+  
+8. Garrett Grolemund, Hadley Wickham (2011). Dates and Times Made Easy with lubridate. Journal of
+  Statistical Software, 40(3), 1-25. URL https://www.jstatsoft.org/v40/i03/
+
+9. Thomas Lin Pedersen and David Robinson (2020). gganimate: A Grammar of Animated Graphics. R
+  package version 1.0.7. https://CRAN.R-project.org/package=gganimate

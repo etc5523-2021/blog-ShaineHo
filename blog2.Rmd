@@ -138,7 +138,7 @@ ggplotly(sa_map, height = 500, width = 800) %>%
   
 ```  
 
-Based on the map above, it is fond that, the total number of cases confirmed is pretty high in the whole continent. The highest number is found in Brazil with 21 millions, whereas **Argentina is the second highest in the continent** with 5 millions total number of cases confirmed. 
+Based on the map above, it is found that, the total number of cases confirmed is pretty high in the whole continent. The highest number is found in Brazil with 21 millions, whereas **Argentina is the second highest in the continent** with 5 millions total number of cases confirmed. While the lowest was found in Guyana located in the Northern part of South America.
 
 **[NOTE: The map is interactive, feel free to move around and look for more information!]**
 
@@ -235,7 +235,7 @@ animate(arg_vaccine, fps = 10)
 
 ```
 
-It is found that the there was a sharp increase to the trend of people injected at least 1 dose of the vaccinations. Moreover, steeper trend of increase in people vaccinated at least 1 dose as well as the larger proportion of people fully vaccinated were oberserved from June 2021. This also explained the effectiveness of the vaccines as there was a great decrease in the number of confirmed cases since then.
+It is found that the there was a sharp increase to the trend of people injected at least 1 dose of the vaccinations. Moreover, steeper trend of increase in people vaccinated at least 1 dose as well as the larger proportion of people fully vaccinated were observed from June 2021. This also explained the effectiveness of the vaccines as there was a great decrease in the number of confirmed cases since then.
 
 # References
 

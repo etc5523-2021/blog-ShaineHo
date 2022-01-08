@@ -5,20 +5,28 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 ```
 
-```{css, echo = FALSE}
+```{css}
 .navbar{
   background: #66CDAA;
 }
-h1{
+h1,h3{
   color: #008B8B;
 }
 ```
 
-# Welcome
+# **Welcome**
 
-Hello there! This is Shaine's blog~
+<br>
 
-<img src="https://i2.wp.com/nileease.com/wp-content/uploads/2020/09/fbe42f6da526b9da82ddba860e5700bf.gif" alt="Bello">
+### *Hello there! This is Shaine's blog~*
+
+### *The blog is made for the assignment 1 & 2 of ETC5523 Communicating with Data*
+
+<br>
+
+```{r welcomegif, out.extra='style="padding:20px"'}
+knitr::include_graphics("linabell.gif")
+```
